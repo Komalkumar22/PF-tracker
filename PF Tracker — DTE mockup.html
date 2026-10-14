@@ -1,0 +1,113 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>PF Tracker — DTE</title>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F3F1EC;--card:#fff;--ink:#1D2530;--mut:#66707C;--ln:#D9D5CB;--act:#E8EFF5;--bad:#B3261E;--ac:#3B6E96;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14181D;--card:#1C222A;--ink:#E6E9ED;--mut:#98A2AD;--ln:#333B45;--act:#243342;--bad:#F29A94}}
+:root[data-theme="dark"]{--bg:#14181D;--card:#1C222A;--ink:#E6E9ED;--mut:#98A2AD;--ln:#333B45;--act:#243342;--bad:#F29A94}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 "Public Sans",system-ui,sans-serif}
+h1,h2{margin:0;font-weight:600}.m{color:var(--mut)}
+header{display:flex;gap:12px;align-items:center;padding:10px 18px;background:var(--card);border-bottom:3px solid var(--ac);flex-wrap:wrap;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+header .s{margin-left:auto}
+.chip{background:var(--ac);color:#fff;padding:2px 10px;border-radius:2px;font-size:12px}
+main,.lg{max-width:1040px;margin:0 auto;padding:20px 18px 60px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+.stats div{background:var(--card);border:1px solid var(--ln);padding:12px;color:var(--mut);font-size:12.5px}.stats b{display:block;font-size:24px;color:var(--ink)}
+.wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;background:var(--card);font-size:13px}
+th,td{border:1px solid var(--ln);padding:7px 9px;text-align:left}th{background:var(--act);font-weight:500;font-size:12px}
+tr.h{cursor:pointer}tr.h:hover td{background:var(--act)}
+button{font:inherit;cursor:pointer;border:1px solid var(--ln);background:var(--card);color:var(--ink);padding:7px 13px;border-radius:3px}
+button:focus-visible,input:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+.p{background:var(--ac);border-color:var(--ac);color:#fff}.d{border-color:var(--bad);color:var(--bad)}
+.pill{padding:2px 9px;border-radius:2px;font-size:12px;background:color-mix(in srgb,var(--pc) 16%,transparent);color:var(--pc);white-space:nowrap}
+.card{background:var(--card);border:1px solid var(--ln);padding:16px;margin:14px 0}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+label{display:grid;gap:3px;font-size:12px;color:var(--mut)}
+input,textarea{font:inherit;padding:7px 9px;border:1px solid var(--ln);background:var(--bg);color:var(--ink);border-radius:2px;width:100%}
+input:disabled{background:transparent;border-color:transparent;padding-left:0;-webkit-text-fill-color:var(--ink);opacity:1}
+.steps{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}.steps span{font-size:12px;padding:4px 10px;border:1px solid var(--ln);color:var(--mut)}
+.steps .c{background:var(--ac);border-color:var(--ac);color:#fff}.steps .o{color:var(--ink);border-color:var(--ac)}
+.note{background:var(--act);border-left:3px solid var(--ac);padding:8px 12px;margin:12px 0}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}
+.lt td.n{text-align:right;font-variant-numeric:tabular-nums}.lt input{text-align:right;padding:3px 5px;border-radius:0;min-width:80px}
+.lh{text-align:center;font-weight:500;margin-bottom:8px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:20px}
+.rc{text-align:left;display:grid;gap:6px;padding:14px;border-top:4px solid var(--ac);background:var(--card)}
+.rc span{color:var(--mut);font-size:12.5px}.rc i{color:var(--ac);font-style:normal;font-size:12.5px}
+ul.lg2{list-style:none;padding:0;margin:0;font-size:12.5px}ul.lg2 li{padding:5px 0;border-bottom:1px solid var(--ln)}
+</style></head><body><div id="app"></div>
+<script>
+const $=i=>document.getElementById(i),fmt=n=>Number(n||0).toLocaleString('en-IN'),INST='VJTI, Mumbai';
+const R={
+im:{n:'Institute Maker',c:'#2A7F8E',u:'Institute maker · '+INST,d:'Create employee PF profiles and submit them to the institute checker.',q:[0]},
+ic:{n:'Institute Checker',c:'#5B5FC7',u:'Institute checker · '+INST,d:'Verify the maker’s entries, or reject them back with a remark.',q:[1]},
+dm:{n:'DTE Maker',c:'#B7791F',u:'DTE admin maker · Mumbai',d:'Verify, and where needed edit, profiles and yearly PF ledgers.',q:[2]},
+dc:{n:'DTE Checker',c:'#2F855A',u:'DTE admin checker · Mumbai',d:'Final verification before a profile is committed to the database.',q:[3]},
+dr:{n:'DTE Director',c:'#5A6572',u:'Director, DTE · read-only',d:'Read-only view of every employee profile and yearly ledger.',q:[]}};
+const ST=['Draft','Pending Institute Checker','Pending DTE Maker','Pending DTE Checker','Approved'],PC=['#7A828C','#3B78B5','#B7791F','#8B5CC7','#2F855A'];
+const F=[['name','Employee name','text'],['id','Employee ID','text'],['post','Post','text'],['dob','Birth date','date'],['inst','Institute name','text'],['doj','Joining date','date'],['dor','Retirement date','date'],['pf','Applicable monthly PF (₹)','number']];
+const M=['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+const led=(pf,o)=>({open:o||0,rows:M.map(()=>({s:pf,r:0,a:0,w:0,v:''}))});
+const sl=n=>['Submitted','Verified','Verified','Approved'].slice(0,n).map((a,i)=>[R[['im','ic','dm','dc'][i]].n,a,'','2026-09-'+(20+i)]);
+const mled=()=>{const l=led(1455,495425);for(let i=7;i<12;i++)l.rows[i].s=2330;l.rows[2].a=885;l.rows[11].w=187500;l.rows[11].v='Vr. 4471 / 12-03-2011';return l};
+let E=[
+{id:'NGC/ENGG/VJTI/131',name:'Smt. Meena S. Panse',post:'Lecturer (Engg.)',dob:'1968-05-14',inst:INST,doj:'1994-07-01',dor:'2028-05-31',pf:2330,st:2,fy:'2010-11',led:mled(),remark:'',log:sl(2)},
+{id:'NGC/ENGG/VJTI/207',name:'Shri Rajesh K. Patil',post:'Workshop Instructor',dob:'1975-02-03',inst:INST,doj:'2001-08-16',dor:'2035-02-28',pf:1200,st:1,fy:'2025-26',led:null,remark:'',log:sl(1)},
+{id:'NGC/ADM/VJTI/088',name:'Smt. Sunita D. Kulkarni',post:'Senior Clerk',dob:'1980-11-21',inst:INST,doj:'2005-06-01',dor:'2040-11-30',pf:1800,st:0,fy:'2025-26',led:null,remark:'',rej:'Joining date does not match the service book. Correct and resubmit.',log:[['Institute Checker','Rejected','Joining date does not match the service book.','2026-09-24']]},
+{id:'GP/PUN/412',name:'Shri Anil B. More',post:'Lecturer (Mech.)',dob:'1971-07-09',inst:'Govt. Polytechnic, Pune',doj:'1998-01-12',dor:'2031-07-31',pf:1500,st:3,fy:'2025-26',led:led(1500,120000),remark:'',log:sl(3)},
+{id:'GP/NAG/119',name:'Smt. Vandana R. Joshi',post:'Head of Department',dob:'1969-03-30',inst:'Govt. Polytechnic, Nagpur',doj:'1993-09-01',dor:'2029-03-31',pf:2000,st:4,fy:'2025-26',led:led(2000,300000),remark:'Verified against pay register.',log:sl(4)}];
+let S={role:null,tab:'q',sel:null,led:false,msg:''};
+const vis=()=>E.filter(e=>S.role=='im'||S.role=='ic'?e.inst==INST:true);
+function calc(e){const L=e.led||led(+e.pf);let o=+L.open,u=0,ti=0,ui=0,sb=0,rf=0,ar=0,wd=0,cl=[];
+L.rows.forEach(r=>{const a=+r.a,w=+r.w,c=o+ +r.s+ +r.r+a-w,uc=u+a;ti+=Math.max(0,Math.min(o,c))*.08/12;ui+=Math.min(u,uc)*.08/12;o=c;u=uc;sb+=+r.s;rf+=+r.r;ar+=a;wd+=w;cl.push(c)});
+return{cl,sb,rf,ar,wd,ti:Math.round(ti),ui:Math.round(ui),o:+L.open}}
+const trow=c=>`<td>Total</td><td class=n>${fmt(c.sb)}</td><td class=n>${fmt(c.rf)}</td><td class=n>${fmt(c.ar)}</td><td class=n>${fmt(c.wd)}</td><td></td><td class=n>${fmt(c.cl[11])}</td>`;
+function sum(e,c,ed){const d=c.sb+c.rf,I=c.ti-c.ui,rows=[['Balance from previous year',c.o,c.o,0],['Deposits and refunds',d+c.ar,d,c.ar],['Interest for April–March',c.ti,I,c.ui]];
+const t=[0,1,2,3].map(k=>rows.reduce((a,r)=>a+r[k],0)),n=[c.wd,c.wd,0],f=[t[1]-n[0],t[2]-n[1],t[3]-n[2]];
+const x=[...rows,['Total',t[1],t[2],t[3]],['Deduct – Withdrawals',...n],['Total (closing)',...f]];
+return `<table><tr><th></th><th>Total</th><th>Withdrawable</th><th>Unwithdrawable</th></tr>${x.map((r,i)=>`<tr${i==3||i==5?' style="font-weight:600"':''}><td>${i+1}. ${r[0]}</td>${r.slice(1).map(v=>`<td class=n>${fmt(v)}</td>`).join('')}</tr>`).join('')}<tr><td>7. Remark</td><td colspan=3>${ed?`<input value="${e.remark}" oninput="E[S.sel].remark=this.value">`:e.remark||'—'}</td></tr></table>`}
+function ledger(e,ed){const L=e.led||led(+e.pf),c=calc(e),y=+e.fy.slice(0,4);
+const I=(i,k)=>ed?`<input type=number min=0 value="${L.rows[i][k]}" oninput="le(${i},'${k}',this.value)">`:fmt(L.rows[i][k]);
+return `<div class="card wrap"><div class=lh>${e.name} (${e.id})<br><span class=m>Year ${e.fy} · pay on 31st March preceding Rs. · Int. @ 8%</span></div>
+${ed?`<label style="max-width:240px;margin-bottom:8px">Opening balance (₹)<input type=number value="${L.open}" oninput="le(-1,'open',this.value)"></label>`:''}
+<table class=lt><tr><th>Month</th><th>Subscription</th><th>Refund of Withdrawal</th><th>6th Pay Arrs</th><th>Withdrawal</th><th>Vr. No. &amp; date</th><th>Closing Balance</th></tr>
+${L.rows.map((r,i)=>`<tr><td>${M[i]} '${String(i<9?y:y+1).slice(2)}</td><td class=n>${I(i,'s')}</td><td class=n>${I(i,'r')}</td><td class=n>${I(i,'a')}</td><td class=n>${I(i,'w')}</td><td>${ed?`<input style="text-align:left" value="${r.v}" oninput="E[S.sel].led.rows[${i}].v=this.value">`:r.v||''}</td><td class=n id=c${i}>${fmt(c.cl[i])}</td></tr>`).join('')}
+<tr id=tr style="font-weight:600">${trow(c)}</tr></table>
+<div class=lh style="margin:14px 0 6px">Space for calculation of interest etc.</div><div id=sum>${sum(e,c,ed)}</div></div>`}
+function le(i,k,v){const e=E[S.sel];if(i<0)e.led.open=v;else e.led.rows[i][k]=v;const c=calc(e);c.cl.forEach((x,j)=>$('c'+j).textContent=fmt(x));$('tr').innerHTML=trow(c);$('sum').innerHTML=sum(e,c,true)}
+const pill=s=>`<span class=pill style="--pc:${PC[s]}">${ST[s]}</span>`;
+const go=r=>{S={role:r,tab:'q',sel:null,led:false,msg:''};render()};
+const op=i=>{S.sel=i;S.led=false;S.msg='';render()};
+function nw(){E.unshift({id:'',name:'',post:'',dob:'',inst:INST,doj:'',dor:'',pf:'',st:0,fy:'2025-26',led:null,remark:'',log:[['Institute Maker','Draft created','','today']]});op(0)}
+function mv(s,act,note){const e=E[S.sel];
+if(S.role=='im'&&!F.every(f=>String(e[f[0]]).trim())){S.msg='Fill every field before submitting.';return render()}
+if(S.role=='im')e.led=led(+e.pf);
+if(S.role!='im'&&!note&&s<e.st){S.msg='Add a remark before rejecting.';return render()}
+e.log.push([R[S.role].n,act,note||'',new Date().toLocaleDateString('en-IN')]);e.st=s;e.rej=s<e.st?note:'';S.sel=null;S.msg=act+' — '+e.name;render()}
+const rm=()=>($('rm')?$('rm').value.trim():'');
+function detail(){const e=E[S.sel],r=S.role,ed=(r=='im'&&e.st==0)||(r=='dm'&&e.st==2),lo=r=='dm'&&e.st==2;let a='';
+const b=(c,t,f)=>`<button class="${c}" onclick="${f}">${t}</button>`;
+if(r=='im'&&e.st==0)a=b('p','Submit to Institute Checker',"mv(1,'Submitted to Institute Checker')");
+if(r=='ic'&&e.st==1)a=b('p','Verify &amp; forward to DTE Maker',"mv(2,'Verified',rm())")+b('d','Reject to maker',"mv(0,'Rejected',rm())");
+if(r=='dm'&&e.st==2)a=b('','Save edits',"S.msg='Edits saved to profile and ledger.';E[S.sel].log.push(['DTE Maker','Edited profile / ledger','','today']);render()")+b('p','Verify &amp; forward to DTE Checker',"mv(3,'Verified',rm())");
+if(r=='dc'&&e.st==3)a=b('p','Approve &amp; submit to database',"mv(4,'Approved — committed to database',rm())")+b('d','Reject to DTE Maker',"mv(2,'Rejected',rm())");
+return `<button onclick="S.sel=null;S.msg='';render()">← Back to list</button>
+<h2 style="margin-top:14px">${e.name||'New employee profile'}</h2>
+<div class=steps>${ST.map((s,i)=>`<span class="${i<e.st?'c':i==e.st?'o':''}">${i+1}. ${s}</span>`).join('')}</div>
+${r=='dr'?'<div class=note>Read-only access. No fields can be changed from this login.</div>':''}
+${e.rej&&e.st==0?`<div class=note style="border-color:var(--bad)"><b>Returned by checker:</b> ${e.rej}</div>`:''}
+<div class=card><div class=fg>${F.map(([k,l,t])=>`<label>${l}<input type=${t} value="${e[k]}" ${ed?'':'disabled'} oninput="E[S.sel].${k}=this.value"></label>`).join('')}</div></div>
+${a?`<div class=bar>${r!='im'?'<input id=rm placeholder="Remark (required for rejection)" style="max-width:340px">':''}${a}</div>`:''}
+<div class=bar>${b('',S.led?'Hide yearly PF ledger':'View yearly PF ledger ('+e.fy+')','S.led=!S.led;render()')}${lo?'<span class=m>Ledger cells are editable for you at this stage.</span>':''}</div>
+${S.led?ledger(e,lo):''}
+<h3 style="font-size:14px;margin:18px 0 6px">Audit trail</h3><ul class=lg2>${e.log.map(l=>`<li><b>${l[0]}</b> — ${l[1]}${l[2]?': '+l[2]:''} <span class=m>· ${l[3]}</span></li>`).join('')}</ul>`}
+function home(){const r=R[S.role],L=vis(),Q=L.filter(e=>r.q.includes(e.st)),t=S.role=='dr'?'a':S.tab,rows=t=='q'?Q:L;
+return `<h2>${r.n} workspace</h2><p class=m style="margin:2px 0">${r.d}</p>
+<div class=stats><div><b>${Q.length}</b>Awaiting your action</div><div><b>${L.length}</b>Profiles in scope</div><div><b>${L.filter(e=>e.st==4).length}</b>Approved in database</div></div>
+<div class=bar>${S.role!='dr'?`<button class="${t=='q'?'p':''}" onclick="S.tab='q';render()">My queue</button><button class="${t=='a'?'p':''}" onclick="S.tab='a';render()">All profiles</button>`:''}${S.role=='im'?'<button class=p style="margin-left:auto" onclick="nw()">+ New employee profile</button>':''}</div>
+<div class=wrap><table><tr><th>Employee ID</th><th>Name</th><th>Post</th><th>Institute</th><th>Stage</th></tr>${rows.length?rows.map(e=>`<tr class=h onclick="op(${E.indexOf(e)})"><td>${e.id||'—'}</td><td>${e.name||'(unnamed draft)'}</td><td>${e.post}</td><td>${e.inst}</td><td>${pill(e.st)}</td></tr>`).join(''):'<tr><td colspan=5 class=m>Nothing waiting for you.</td></tr>'}</table></div>`}
+function render(){document.documentElement.style.setProperty('--ac',S.role?R[S.role].c:'#3B6E96');
+$('app').innerHTML=!S.role?`<div class=lg><h1>Provident Fund Tracker</h1><p class=m>Directorate of Technical Education. Choose a login to open its workspace.</p><div class=cards>${Object.entries(R).map(([k,r],i)=>`<button class=rc style="--ac:${r.c}" onclick="go('${k}')"><b>${i+1}. ${r.n}</b><span>${r.d}</span><i>Enter workspace →</i></button>`).join('')}</div></div>`
+:`<header><b>PF Tracker</b><span class=chip>${R[S.role].n}</span><span class=m>${R[S.role].u}</span><button class=s onclick="go(null)">Switch login</button></header><main>${S.msg?`<div class=note>${S.msg}</div>`:''}${S.sel!=null?detail():home()}</main>`}
+render();
+</script></body></html>
